@@ -32,11 +32,12 @@ This project presents an interactive visualization of Netflix's content library,
 netflix-visualization/
 ├── data/
 │   └── nextflix_titles.json
-├── libs/
+├── libes/
 │   ├── d3.v7.min.js
 │   └── topojson@3
 ├── styles.css
 ├── main.js
+├── data-loader.js
 ├── index9.html
 └── README.md
 ```
@@ -107,6 +108,7 @@ The visualization uses Netflix content data stored in `data/nextflix_titles.json
 - Uses D3.js for force-directed graph
 - Chart.js for bar and pie charts
 - Plotly.js for additional visualizations
+- Data-loader.js for handling data loading and preprocessing
 - Responsive design for different screen sizes
 
 ## Screenshot

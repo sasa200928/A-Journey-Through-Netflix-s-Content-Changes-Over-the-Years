@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Content Evolution</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Load only one version of D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script type="module" src="main.js"></script>
+    <style>
+       
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .content-type-container {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .chart-box {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin-bottom: 20px;
+        }
+
+        .chart-box h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            color: #333;
+            font-family: Arial, Helvetica, sans-serif !important;
+            font-weight: bold;
+        }
+
+        #overall-content-type-summary {
+            margin: 15px 0;
+            font-family: Arial, Helvetica, sans-serif !important;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        #pie-legend, 
+        #bar-legend {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        #pie-legend div, 
+        #bar-legend div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: Arial, Helvetica, sans-serif !important;
+            font-size: 14px;
+            color: #333;
+        }
+
+        #pie-legend div div, 
+        #bar-legend div div {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        #pie-legend span, 
+        #bar-legend span {
+            font-family: Arial, Helvetica, sans-serif !important;
+            font-size: 14px;
+            color: #333;
+        }
+
+        #barChart {
+            width: 270px !important;
+            height: 200px !important;
+            margin: 0 auto;
+        }
+
+        /* Override any external font styles */
+        .content-type-container * {
+            font-family: Arial, Helvetica, sans-serif !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <a href="#description">A Journey Through Netflix's Content Changes Over the Years</a>
+        </h1>
+
+        <div class="project-info">
+            <p class="developer-info">Developed by: Shams Alfaris</p>
+            <p class="supervisor-info">Supervised by: Professor DR. Amir AkhavanMasoumi</p>
+            <p class="course-info">
+                FINAL PROJECT<br>
+                CIS 568-7101: Data Visualization - On-Line (2025 Spring CE1)
+            </p>
+        </div>
+
+        <div class="content-charts">
+            <div class="chart-box">
+                <h3>Content Type</h3>
+                <svg id="content-type-pie" width="120" height="120"></svg>
+                <div id="overall-content-type-summary"></div>
+                <div id="pie-legend">
+                    <div>
+                        <div style="background-color: #E50914;"></div>
+                        <span>Movie</span>
+                    </div>
+                    <div>
+                        <div style="background-color: #221f1f;"></div>
+                        <span>TV Show</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <h3>Content Type by Country</h3>
+                <div id="barChart"></div>
+                <div id="bar-legend">
+                    <div>
+                        <div style="background-color: #E50914;"></div>
+                        <span>Movie</span>
+                    </div>
+                    <div>
+                        <div style="background-color: #221f1f;"></div>
+                        <span>TV Show</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <h3>Content Added Over Time</h3>
+                <div id="lineChart"></div>
+                <div id="line-legend">
+                    <div>
+                        <div style="background-color: #E50914;"></div>
+                        <span>Movie</span>
+                    </div>
+                    <div>
+                        <div style="background-color: #221f1f;"></div>
+                        <span>TV Show</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <h3>Content by Rating</h3>
+                <div id="ratingChart"></div>
+            </div>
+
+            <div class="chart-box">
+                <h3>Genre Distribution</h3>
+                <div id="genrePieChart"></div>
+                <div id="genre-legend"></div>
+            </div>
+
+            <div class="chart-box">
+                <h3>Content Duration vs. Release Year</h3>
+                <div id="bubbleChart"></div>
+                <div id="bubble-legend">
+                    <div>
+                        <div style="background-color: #E50914;"></div>
+                        <span>Movie</span>
+                    </div>
+                    <div>
+                        <div style="background-color: #221f1f;"></div>
+                        <span>TV Show</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section id="description" class="section">
+            <p>
+                Netflix's content selections have changed significantly over time. From its humble beginnings as a DVD rental service to becoming a global streaming behemoth, the platform has constantly evolved to match consumers' shifting interests and needs. This transition is reflected in the types of films and television shows accessible, as well as their genres, countries of origin, and release dates. Despite its success, the reasons for Netflix's shifting content strategy are not well understood. By examining the changes in Netflix's content library, we can discover patterns and insights into how the platform has responded to cultural trends, technical improvements, and user preferences.
+            </p>
+        </section>
+
+        <section id="netflix-timeline-section" class="section">
+            <h2>Netflix Content Timeline</h2>
+            <div class="timeline-container">
+                <div id="timeline-slider">
+                    <input type="range" id="year-slider" min="1925" max="2021" value="2020" step="1">
+                    <div id="year-labels">
+                        <span>1925</span>
+                        <span>1930</span>
+                        <span>1935</span>
+                        <span>1940</span>
+                        <span>1945</span>
+                        <span>1950</span>
+                        <span>1955</span>
+                        <span>1960</span>
+                        <span>1965</span>
+                        <span>1970</span>
+                        <span>1975</span>
+                        <span>1980</span>
+                        <span>1985</span>
+                        <span>1990</span>
+                        <span>1995</span>
+                        <span>2000</span>
+                        <span>2005</span>
+                        <span>2010</span>
+                        <span>2015</span>
+                        <span>2021</span>
+                    </div>
+                    <div id="slider-thumb"></div>
+                </div>
+                <div id="selected-year">2020</div>
+            </div>
+        </section>
+
+        <section id="genre-distribution-section" class="section">
+            <h2 id="genre-distribution-chart-title">Genre Distribution Over the Years</h2>
+            <div id="genre-distribution-chart-container">
+                <canvas id="genreDistributionChart"></canvas>
+            </div>
+        </section>
+
+        <section id="content-origin-chart-section" class="section">
+            <h2 id="content-origin-chart-title">Content Origin Over the Years</h2>
+            <div id="content-origin-chart-container">
+                <canvas id="contentOriginChart"></canvas>
+            </div>
+        </section>
+
+        <section id="international-movies-chart-section" class="section">
+            <h2>International Movies Over the Years</h2>
+            <div id="international-movies-chart-container">
+                <canvas id="internationalMovieChart" width="800" height="400"></canvas>
+            </div>
+        </section>
+
+        <section id="content-graph-section" class="section">
+            <h2>Content Relationship Graph by Production Year</h2>
+            <div id="year-buttons">
+            </div>
+            <div id="content-visualization">
+                <svg id="content-svg"></svg>
+            </div>
+            <div id="content-tooltip" class="content-tooltip"></div>
+        </section>
+
+        <section class="section">
+            <h2> This Website Story </h2>
+            <p>
+                The story of Netflix's content progress is particularly relevant and interesting for several reasons:
+            </p>
+            <ul>
+                <li class="subsection-container">
+                    <span class="subsection-trigger">Impact of Changing Viewer Preferences:</span>
+                    <div class="subsection-content">
+                        As Netflix expanded globally, its viewership became more diversified, creating a greater demand for
+                        international material, original programming, and niche genres. Exploring how Netflix responded to
+                        these changing preferences can provide significant insights into how global streaming platforms
+                        cater to different locations.
+                    </div>
+                </li>
+                <li class="subsection-container">
+                    <span class="subsection-trigger">Technological and Market Changes:</span>
+                    <div class="subsection-content">
+                        Netflix's evolution reflects larger technological advancements and market realities. The change from DVD
+                        rentals to streaming, the expansion of mobile viewing, and the increased availability of smart TVs
+                        have all had an impact on the platform's content strategy. Understanding how Netflix has dealt
+                        with these shifts gives light on the role of technology in influencing contemporary entertainment.
+                    </div>
+                </li>
+                <li class="subsection-container">
+                    <span class="subsection-trigger">Cultural and Regional Influence:</span>
+                    <div class="subsection-content">
+                        As Netflix expanded its reach to new nations, it needed to accommodate to a variety of cultural
+                        preferences. This has resulted in the creation of internationally popular television shows and
+                        films, ranging from Spanish-language dramas like Money Heist to Indian originals like Sacred Games.
+                        This shift in programming offers demonstrates how Netflix has embraced local storytelling while
+                        maintaining global appeal.
+                    </div>
+                </li>
+                <li class="subsection-container">
+                    <span class="subsection-trigger">Business Strategy Insights:</span>
+                    <div class="subsection-content">
+                        Understanding Netflix's content strategy teaches professionals in the entertainment, technology,
+                        and media industries valuable insights about business agility and audience engagement. As Netflix
+                        competes with rival streaming services, its constantly evolving content library is critical to
+                        its ability to keep and grow users worldwide.
+                    </div>
+                </li>
+                <li class="subsection-container">
+                    <span class="subsection-trigger">Viewer Engagement:</span>
+                    <div class="subsection-content">
+                        By following the evolution of Netflix's content, viewers may obtain a better understanding of the
+                        platform's decisions and how they've influenced their own viewing experiences. This story allows
+                        for an examination of not only Netflix's rise, but also how modern audiences consume
+                        entertainment in an increasingly digital and on-demand environment.
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+</body>
+</html>

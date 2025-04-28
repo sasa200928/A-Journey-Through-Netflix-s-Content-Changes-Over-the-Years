@@ -89,21 +89,6 @@ The following screenshots demonstrate the key features of the visualization:
 - Responsive design for different screen sizes
 
 
-### Project Structure
-```
-netflix-visualization/
-├── data/
-│   └── nextflix_titles.json
-├── libes/
-│   ├── d3.v7.min.js
-│   └── topojson@3
-├── styles.css
-├── main.js
-├── data-loader.js
-├── index9.html
-└── README.md
-```
-
 ## Visualization Components
 
 ### 1. Content Type Distribution
